@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 data class ErrorResponse(
     val status: String,
     val message: String,
-    val errors: Map<String, List<String>>
+    val data: Map<String, List<String>> = mapOf()
 )

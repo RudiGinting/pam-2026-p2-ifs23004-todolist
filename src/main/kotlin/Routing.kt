@@ -15,32 +15,27 @@ fun Application.configureRouting() {
     val todoController: TodoController by inject()
 
     install(StatusPages) {
-
         // Tangkap AppException
         exception<AppException> { call, cause ->
-            val errorMap = parseMessageToMap(cause.message)
+            val dataMap: Map<String, List<String>> = parseMessageToMap(cause.message)
 
             call.respond(
                 status = HttpStatusCode.fromValue(cause.code),
                 message = ErrorResponse(
                     status = "fail",
-                    message = if (errorMap.isEmpty())
-                        cause.message
-                    else
-                        "Data yang dikirimkan tidak valid!",
-                    errors = errorMap
+                    message = if (dataMap.isEmpty()) cause.message else "Data yang dikirimkan tidak valid!",
+                    data = dataMap
                 )
             )
         }
 
-        // Tangkap semua error lain
+        // Tangkap semua Throwable lainnya
         exception<Throwable> { call, cause ->
             call.respond(
-                status = HttpStatusCode.InternalServerError,
+                status = HttpStatusCode.fromValue(500),
                 message = ErrorResponse(
                     status = "error",
                     message = cause.message ?: "Unknown error",
-                    errors = emptyMap()
                 )
             )
         }
@@ -52,11 +47,22 @@ fun Application.configureRouting() {
         }
 
         route("/todos") {
-            get { todoController.getAllTodos(call) }
-            post { todoController.createTodo(call) }
-            get("/{id}") { todoController.getTodoById(call) }
-            put("/{id}") { todoController.updateTodo(call) }
-            delete("/{id}") { todoController.deleteTodo(call) }
+            get {
+                todoController.getAllTodos(call)
+            }
+            post {
+                todoController.createTodo(call)
+            }
+            get("/{id}") {
+                todoController.getTodoById(call)
+            }
+            put("/{id}") {
+                todoController.updateTodo(call)
+            }
+            delete("/{id}") {
+                todoController.deleteTodo(call)
+            }
         }
+
     }
 }

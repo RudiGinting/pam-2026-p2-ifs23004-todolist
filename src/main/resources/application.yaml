@@ -5,4 +5,3 @@ ktor:
   deployment:
     port: ${APP_PORT}
     host: ${APP_HOST}
-
